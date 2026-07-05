@@ -5,4 +5,7 @@ app = FastAPI()
 
 @app.get(path = "/")
 def home():
-    return "Hello!"
+    return {
+        "message": "Welcome to Student Management API, build by Sharma Enterprises."
+    }
+
