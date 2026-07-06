@@ -29,10 +29,10 @@ def student_info(student_id: int):
 @app.get("/student/{student_id}/semester/{semester}")
 def student_semester_detail(student_id: int, semester: int):
     for each_student_marks in SEMESTER_1:
-        if student_id == each_student_marks["id"]:
+        if student_id == each_student_marks["id"] and semester == 1:
             return student_info(student_id) | each_student_marks
     
-    raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = f"Student with ID {student_id} not found!")
+    raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = f"Marks of Semester {semester} ID {student_id} not found!")
 
 # ABOUT PAGE ROUTE
 @app.get("/about")
