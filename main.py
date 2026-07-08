@@ -25,6 +25,11 @@ def student_info(student_id: int):
 
     raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = f"Student with ID {student_id} not found!")
 
+# RETURNING ALL STUDENTS
+@app.get("/students")
+def all_students_info():
+    return STUDENT_DATA
+
 # EACH SEMESTER DETAILS PAGE ROUTE
 @app.get("/student/{student_id}/semester/{semester}")
 def student_semester_detail(student_id: int, semester: int):
