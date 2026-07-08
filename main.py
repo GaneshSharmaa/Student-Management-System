@@ -27,16 +27,18 @@ def student_info(student_id: int):
 
 # QUERY PARAMETER FOR FILTERING BASED ON SEX
 @app.get("/students")
-def filter_sex(sex: str | None = None):
+def filter_sex(sex: str | None = None, latest_qualification: str | None = None):
     filtered_students = []
-    
-    if sex == None:
-        return STUDENT_DATA
-    
+
     for each_student in STUDENT_DATA:
-        if each_student["sex"] == sex:
-            filtered_students.append(each_student)
-    
+        if sex is not None and each_student["sex"] != sex:
+            continue
+
+        if (latest_qualification is not None and each_student["latest_qualification"] != latest_qualification):
+            continue
+
+        filtered_students.append(each_student)
+
     return filtered_students
 
 # EACH SEMESTER DETAILS PAGE ROUTE
