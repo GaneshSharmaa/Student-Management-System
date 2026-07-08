@@ -25,10 +25,19 @@ def student_info(student_id: int):
 
     raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = f"Student with ID {student_id} not found!")
 
-# RETURNING ALL STUDENTS
+# QUERY PARAMETER FOR FILTERING BASED ON SEX
 @app.get("/students")
-def all_students_info():
-    return STUDENT_DATA
+def filter_sex(sex: str | None = None):
+    filtered_students = []
+    
+    if sex == None:
+        return STUDENT_DATA
+    
+    for each_student in STUDENT_DATA:
+        if each_student["sex"] == sex:
+            filtered_students.append(each_student)
+    
+    return filtered_students
 
 # EACH SEMESTER DETAILS PAGE ROUTE
 @app.get("/student/{student_id}/semester/{semester}")
