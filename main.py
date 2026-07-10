@@ -72,18 +72,18 @@ def contact():
         "website": "https://ganeshsharma.tech"
     }
 
-def highest_id(DATA):
+# HELPER FUNCTION FOR FINDING OUT HIGHEST ID AND THEN INCREMENTING IT BY 1
+def new_id(DATA):
     HIGHEST_ID = DATA[0]["id"]
     for each_data in DATA:
         if each_data["id"] > HIGHEST_ID:
             HIGHEST_ID = each_data["id"]
     return HIGHEST_ID + 1
 
-
 # ENDPOINT FOR ADDING A STUDENT'S INFORMATION
 @app.post("/student")
 def create_student(student: Student):
-    new_student = {"id": highest_id(STUDENT_DATA)} | student.model_dump() # model_dump() converts the Pydantic object to dictionary
+    new_student = {"id": new_id(STUDENT_DATA)} | student.model_dump() # model_dump() converts the Pydantic object to dictionary
     STUDENT_DATA.append(new_student)
     return new_student
 
