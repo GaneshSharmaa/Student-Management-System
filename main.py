@@ -7,7 +7,7 @@ from student_information.student_data import STUDENT_DATA
 from student_information.semester_data import SEMESTER_1
 
 # importing the schemas
-from schemas.student import Student
+from schemas.student import Student, StudentPartialUpdate
 
 # initializing the application
 app = FastAPI()
@@ -97,6 +97,16 @@ def update_student(student_id: int, student: Student):
                 {"id": student_id} | student.model_dump()
             )
             
+            return each_student
+    
+    raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = f"Student with ID {student_id} not found!")
+
+@app.patch("/student/{student_id}")
+def partial_update_student(student_id: int, student: StudentPartialUpdate):
+    for each_student in STUDENT_DATA:
+        if each_student["id"] == student_id:
+            each_student.update(student.model_dump(exclude_unset = True))
+
             return each_student
     
     raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = f"Student with ID {student_id} not found!")
