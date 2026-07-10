@@ -87,4 +87,17 @@ def create_student(student: Student):
     STUDENT_DATA.append(new_student)
     return new_student
 
+# ENDPOINT FOR COMPLETELY REPLACING THE PARTICULAR STUDENT'S INFORMATION
+@app.put("/student/{student_id}")
+def update_student(student_id: int, student: Student):
+    for each_student in STUDENT_DATA:
+        if each_student["id"] == student_id:
+            each_student.clear()
+            each_student.update(
+                {"id": student_id} | student.model_dump()
+            )
+            
+            return each_student
+    
+    raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = f"Student with ID {student_id} not found!")
 
