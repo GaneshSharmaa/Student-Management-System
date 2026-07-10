@@ -101,6 +101,7 @@ def update_student(student_id: int, student: Student):
     
     raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = f"Student with ID {student_id} not found!")
 
+# ENDPOINT FOR PARTIAL UPDATE OF STUDENT'S INFORMATION
 @app.patch("/student/{student_id}")
 def partial_update_student(student_id: int, student: StudentPartialUpdate):
     for each_student in STUDENT_DATA:
