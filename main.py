@@ -87,13 +87,4 @@ def create_student(student: Student):
     STUDENT_DATA.append(new_student)
     return new_student
 
-@app.put("/student/{student_id}")
-def update_student(student: Student, student_id: int):
-    for each_student in STUDENT_DATA:
-        if student_id == each_student["id"]:
-            each_student = {("id": student_id) | (student.model_dump())}
-        else:
-            raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = "Student not found!")
-    
-    return student
 
