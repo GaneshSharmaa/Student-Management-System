@@ -19,5 +19,5 @@ SessionLocal = sessionmaker(bind = engine)
 # `DeclarativeBase` provides the ORM infrastructure such as metadata, registry
 # if we used DeclarativeBase everytime then SQLAlchemy will treat all those models as different registries
 class Base(DeclarativeBase):
-    pass
+    pass   # there is no other attribute, methods, because we want the inheritance, not the behaviour
 
