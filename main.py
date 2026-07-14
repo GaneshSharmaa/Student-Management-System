@@ -9,6 +9,13 @@ from student_information.semester_data import SEMESTER_1
 # importing the schemas
 from schemas.student import Student, StudentPartialUpdate
 
+# importing the models
+from database.database import Base, engine
+from models.student import Student as StudentModel
+
+# creating the database
+Base.metadata.create_all(bind = engine)
+
 # initializing the application
 app = FastAPI()
 
