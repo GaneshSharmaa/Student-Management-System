@@ -88,7 +88,13 @@ def get_students(
 # EACH SEMESTER DETAILS PAGE ROUTE
 @app.get("/student/{student_id}/semester/{semester}")
 def student_semester_detail(student_id: int, semester: int, db: Session = Depends(get_db)):
-    statement = select(SemesterModel).where()
+    statement = select(SemesterModel).where(SemesterModel.semester == semester and SemesterModel.student_id == student_id)
+    result = db.execute(statement).scalars().all()
+
+    if result is None:
+        raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = f"Student with ID {student_id} in semester {semester} not found!")
+
+    return result
 
 # HELPER FUNCTION FOR FINDING OUT HIGHEST ID AND THEN INCREMENTING IT BY 1
 def new_id(DATA):
