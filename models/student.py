@@ -24,4 +24,5 @@ class Semester(Base):
     student_id: Mapped[int] = mapped_column(nullable = False)
     subject: Mapped[str] = mapped_column(String(25), nullable = False)
     marks: Mapped[int] = mapped_column(Integer, nullable = False)
+    semester: Mapped[int] = mapped_column(Integer, nullable = False)
 
