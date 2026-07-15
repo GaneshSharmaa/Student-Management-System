@@ -107,8 +107,11 @@ def new_id(DATA):
 # ENDPOINT FOR ADDING A STUDENT'S INFORMATION
 @app.post("/student")
 def create_student(student: Student, db: Session = Depends(get_db)):
-    new_student = {"id": new_id(STUDENT_DATA)} | student.model_dump() # model_dump() converts the Pydantic object to dictionary
-    STUDENT_DATA.append(new_student)
+    new_student = StudentModel(**student.model_dump())
+    db.add(new_student)         # adding the new data
+    db.commit()                 # commiting the changes into the database
+    db.refresh(new_student)     # refreshing the database so changes are reflected
+
     return new_student
 
 # ENDPOINT FOR COMPLETELY REPLACING THE PARTICULAR STUDENT'S INFORMATION
