@@ -79,6 +79,9 @@ def get_students(
     result = db.execute(statement)
     students = result.scalars().all()
 
+    if students is None:
+        raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = "Student not found!")
+
     return students
 
 # EACH SEMESTER DETAILS PAGE ROUTE
