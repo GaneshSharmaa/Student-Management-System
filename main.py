@@ -15,6 +15,7 @@ from schemas.student import Student, StudentPartialUpdate
 # importing the models
 from database.database import Base, engine
 from models.student import Student as StudentModel
+from models.student import Semester as SemesterModel
 from database.dependencies import get_db
 
 # creating the database
@@ -86,12 +87,8 @@ def get_students(
 
 # EACH SEMESTER DETAILS PAGE ROUTE
 @app.get("/student/{student_id}/semester/{semester}")
-def student_semester_detail(student_id: int, semester: int):
-    for each_student_marks in SEMESTER_1:
-        if student_id == each_student_marks["id"] and semester == 1:
-            return student_info(student_id) | each_student_marks
-
-    raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = f"Marks of Semester {semester} ID {student_id} not found!")
+def student_semester_detail(student_id: int, semester: int, db: Session = Depends(get_db)):
+    statement = select(SemesterModel).where()
 
 # HELPER FUNCTION FOR FINDING OUT HIGHEST ID AND THEN INCREMENTING IT BY 1
 def new_id(DATA):
