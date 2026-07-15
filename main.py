@@ -150,11 +150,22 @@ def update_student(student_id: int, student: Student, db: Session = Depends(get_
 # ENDPOINT FOR PARTIAL UPDATE OF STUDENT'S INFORMATION
 @app.patch("/student/{student_id}")
 def partial_update_student(student_id: int, student: StudentPartialUpdate, db: Session = Depends(get_db)):
-    for each_student in STUDENT_DATA:
-        if each_student["id"] == student_id:
-            each_student.update(student.model_dump(exclude_unset = True))
-
-            return each_student
+    # database query
+    statement = select(StudentModel).where(StudentModel.id == student_id)
+    # executing the query and then storing it in an object
+    updated_student = db.execute(statement).scalars().first()
     
-    raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = f"Student with ID {student_id} not found!")
+    # if the requested student is not found, raise HTTP exception
+    if updated_student is None:
+        raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = f"Student with ID {student_id} not found!")
+
+    # looping over each attribute from the response body and then updating the database attributes
+    for key, value in student.model_dump(exclude_unset = True).items():
+        setattr(updated_student, key, value)
+    
+    # commiting the database operations
+    db.commit()
+    db.refresh(updated_student)
+
+    return updated_student
 
