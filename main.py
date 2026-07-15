@@ -1,6 +1,9 @@
 # importing the modules
-from fastapi import FastAPI, HTTPException, status
+from fastapi import FastAPI, HTTPException, status, Depends
 from pydantic import BaseModel
+from typing import Annotated
+from sqlalchemy.orm import Session
+from sqlalchemy import select
 
 # importing the data from the file
 from student_information.student_data import STUDENT_DATA
@@ -12,6 +15,7 @@ from schemas.student import Student, StudentPartialUpdate
 # importing the models
 from database.database import Base, engine
 from models.student import Student as StudentModel
+from database.dependencies import get_db
 
 # creating the database
 Base.metadata.create_all(bind = engine)
@@ -37,19 +41,19 @@ def student_info(student_id: int):
 
 # QUERY PARAMETER FOR FILTERING BASED ON SEX
 @app.get("/students")
-def filter_sex(sex: str | None = None, latest_qualification: str | None = None):
-    filtered_students = []
+def get_students(sex: str | None = None, latest_qualification: str | None = None, db: Session = Depends(get_db)):
+    statement = select(StudentModel)   # the database statement
+    
+    if sex is not None:
+        statement = statement.where(StudentModel.sex == sex)
+    
+    if latest_qualification is not None:
+        statement = statement.where(StudentModel.latest_qualification == latest_qualification)
 
-    for each_student in STUDENT_DATA:
-        if sex is not None and each_student["sex"] != sex:
-            continue
+    result = db.execute(statement)
+    students = result.scalars().all()
 
-        if (latest_qualification is not None and each_student["latest_qualification"] != latest_qualification):
-            continue
-
-        filtered_students.append(each_student)
-
-    return filtered_students
+    return students
 
 # EACH SEMESTER DETAILS PAGE ROUTE
 @app.get("/student/{student_id}/semester/{semester}")
@@ -89,14 +93,14 @@ def new_id(DATA):
 
 # ENDPOINT FOR ADDING A STUDENT'S INFORMATION
 @app.post("/student")
-def create_student(student: Student):
+def create_student(student: Student, db: Session = Depends(get_db)):
     new_student = {"id": new_id(STUDENT_DATA)} | student.model_dump() # model_dump() converts the Pydantic object to dictionary
     STUDENT_DATA.append(new_student)
     return new_student
 
 # ENDPOINT FOR COMPLETELY REPLACING THE PARTICULAR STUDENT'S INFORMATION
 @app.put("/student/{student_id}")
-def update_student(student_id: int, student: Student):
+def update_student(student_id: int, student: Student, db: Session = Depends(get_db)):
     for each_student in STUDENT_DATA:
         if each_student["id"] == student_id:
             each_student.clear()
@@ -110,7 +114,7 @@ def update_student(student_id: int, student: Student):
 
 # ENDPOINT FOR PARTIAL UPDATE OF STUDENT'S INFORMATION
 @app.patch("/student/{student_id}")
-def partial_update_student(student_id: int, student: StudentPartialUpdate):
+def partial_update_student(student_id: int, student: StudentPartialUpdate, db: Session = Depends(get_db)):
     for each_student in STUDENT_DATA:
         if each_student["id"] == student_id:
             each_student.update(student.model_dump(exclude_unset = True))
