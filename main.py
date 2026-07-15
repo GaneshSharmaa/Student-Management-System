@@ -63,7 +63,11 @@ def student_info(student_id: int, db: Session = Depends(get_db)):
 
 # --------- QUERY PARAMETER FOR FILTERING BASED ON SEX ---------
 @app.get("/students")
-def get_students(sex: str | None = None, latest_qualification: str | None = None, db: Session = Depends(get_db)):
+def get_students(
+    sex: str | None = None,
+    latest_qualification: str | None = None,
+    db: Session = Depends(get_db)
+):
     statement = select(StudentModel)   # the database statement
     
     if sex is not None:
