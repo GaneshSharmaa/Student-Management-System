@@ -23,5 +23,5 @@ class Semester(Base):
     semester_id: Mapped[int] = mapped_column(primary_key = True)
     student_id: Mapped[int] = mapped_column(nullable = False)
     subject: Mapped[str] = mapped_column(String(25), nullable = False)
-    marks: Mapped[int] = mapped_column(Integer(min = 0, max = 100), nullable = False)
+    marks: Mapped[int] = mapped_column(Integer, nullable = False)
 
