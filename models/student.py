@@ -8,6 +8,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 # `mapped_column` represents database column
 # `Mapped` is used for ORM mapping
 
+# database model for student
 class Student(Base):
     __tablename__ = "students"
 
@@ -17,6 +18,7 @@ class Student(Base):
     sex: Mapped[str] = mapped_column(String(8), nullable = False)
     latest_qualification: Mapped[str] = mapped_column(String(20), nullable = False)
 
+# database model for semester data
 class Semester(Base):
     __tablename__ = "semester"
 
