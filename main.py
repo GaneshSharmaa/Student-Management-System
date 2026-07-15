@@ -53,10 +53,11 @@ def contact():
 # ---------- EACH STUDENT INFO PAGE ROUTE ----------
 @app.get("/student/{student_id}")
 def student_info(student_id: int, db: Session = Depends(get_db)):
-    statement = select(StudentModel).where(StudentModel.id == student_id)
-    result = db.execute(statement)
-    student = result.scalars().first()
+    statement = select(StudentModel).where(StudentModel.id == student_id)   # query statement (same as SQL)
+    result = db.execute(statement)      # executing the query
+    student = result.scalars().first()  # storing the result from the database
 
+    # checking if there's no student then raising HTTP exception
     if student is None:
         raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = f"Student with ID {student_id} not found!")
     
@@ -69,17 +70,20 @@ def get_students(
     latest_qualification: str | None = None,
     db: Session = Depends(get_db)
 ):
-    statement = select(StudentModel)   # the database statement
+    statement = select(StudentModel)   # the initial database query statement (same as SQL) to select everything, since it is query parameter
     
+    # if sex is given in query parameter then check it
     if sex is not None:
-        statement = statement.where(StudentModel.sex == sex)
+        statement = statement.where(StudentModel.sex == sex)  # updated database query to include sex
     
+    # if latest_qualification is given in query parameter then check it
     if latest_qualification is not None:
-        statement = statement.where(StudentModel.latest_qualification == latest_qualification)
+        statement = statement.where(StudentModel.latest_qualification == latest_qualification)  # updated database query to include latest qualification
 
-    result = db.execute(statement)
-    students = result.scalars().all()
+    result = db.execute(statement)      # executing the updated database query
+    students = result.scalars().all()   # storing the response from the database
 
+    # if no response found from the database then raise HTTP exception
     if students is None:
         raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = "Student not found!")
 
@@ -88,9 +92,12 @@ def get_students(
 # EACH SEMESTER DETAILS PAGE ROUTE
 @app.get("/student/{student_id}/semester/{semester}")
 def student_semester_detail(student_id: int, semester: int, db: Session = Depends(get_db)):
+    # database query
     statement = select(SemesterModel).where(SemesterModel.semester == semester and SemesterModel.student_id == student_id)
+    # executing the database query and then storing them in a list
     result = db.execute(statement).scalars().all()
 
+    # if nothing is found, raise HTTP exception
     if result is None:
         raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = f"Student with ID {student_id} in semester {semester} not found!")
 
@@ -107,7 +114,9 @@ def new_id(DATA):
 # ENDPOINT FOR ADDING A STUDENT'S INFORMATION
 @app.post("/student")
 def create_student(student: Student, db: Session = Depends(get_db)):
+    # unpacking the student response body as keyword attributes
     new_student = StudentModel(**student.model_dump())
+
     db.add(new_student)         # adding the new data
     db.commit()                 # commiting the changes into the database
     db.refresh(new_student)     # refreshing the database so changes are reflected
@@ -117,16 +126,26 @@ def create_student(student: Student, db: Session = Depends(get_db)):
 # ENDPOINT FOR COMPLETELY REPLACING THE PARTICULAR STUDENT'S INFORMATION
 @app.put("/student/{student_id}")
 def update_student(student_id: int, student: Student, db: Session = Depends(get_db)):
-    for each_student in STUDENT_DATA:
-        if each_student["id"] == student_id:
-            each_student.clear()
-            each_student.update(
-                {"id": student_id} | student.model_dump()
-            )
-            
-            return each_student
+    # database query
+    statement = select(StudentModel).where(StudentModel.id == student_id)
+    # executing the database query and storing them in a list
+    result = db.execute(statement).scalars().first()
     
-    raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = f"Student with ID {student_id} not found!")
+    # if found nothing, then raise a HTTP exception
+    if result is None:
+        raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = f"Student with ID {student_id} not found!")
+
+    # updating the attributes from response body to database attributes
+    result.name = student.name
+    result.age = student.age
+    result.sex = student.sex
+    result.latest_qualification = student.latest_qualification
+
+    # commiting and updating the database operations
+    db.commit()
+    db.refresh(result)
+    
+    return result
 
 # ENDPOINT FOR PARTIAL UPDATE OF STUDENT'S INFORMATION
 @app.patch("/student/{student_id}")
