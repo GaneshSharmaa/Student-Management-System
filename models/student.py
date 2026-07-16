@@ -19,7 +19,7 @@ class Student(Base):
     latest_qualification: Mapped[str] = mapped_column(String(20), nullable = False)
 
 # database model for semester data
-class Semester(Base):
+class SemesterMarks(Base):
     __tablename__ = "semester"
 
     semester_id: Mapped[int] = mapped_column(primary_key = True)
