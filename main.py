@@ -15,7 +15,7 @@ from schemas.student import Student, StudentPartialUpdate
 # importing the models
 from database.database import Base, engine
 from models.student import Student as StudentModel
-from models.student import Semester as SemesterModel
+from models.student import SemesterMarks as SemesterMarksModel
 from database.dependencies import get_db
 
 # creating the database
@@ -93,7 +93,7 @@ def get_students(
 @app.get("/student/{student_id}/semester/{semester}")
 def student_semester_detail(student_id: int, semester: int, db: Session = Depends(get_db)):
     # database query
-    statement = select(SemesterModel).where(SemesterModel.semester == semester, SemesterModel.student_id == student_id)
+    statement = select(SemesterMarksModel).where(SemesterMarksModel.semester == semester, SemesterMarksModel.student_id == student_id)
     # executing the database query and then storing them in a list
     result = db.execute(statement).scalars().all()
 
