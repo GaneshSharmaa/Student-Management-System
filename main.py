@@ -5,9 +5,9 @@ from typing import Annotated
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 
-# importing the data from the file
-from student_information.student_data import STUDENT_DATA
-from student_information.semester_data import SEMESTER_1
+# # importing the data from the file
+# from student_information.student_data import STUDENT_DATA   # moved to data persistence using PostgreSQL
+# from student_information.semester_data import SEMESTER_1    # moved to data persistence using PostgreSQL
 
 # importing the schemas
 from schemas.student import Student, StudentPartialUpdate
