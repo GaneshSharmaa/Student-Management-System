@@ -103,16 +103,8 @@ def student_semester_detail(student_id: int, semester: int, db: Session = Depend
 
     return result
 
-# HELPER FUNCTION FOR FINDING OUT HIGHEST ID AND THEN INCREMENTING IT BY 1
-def new_id(DATA):
-    HIGHEST_ID = DATA[0]["id"]
-    for each_data in DATA:
-        if each_data["id"] > HIGHEST_ID:
-            HIGHEST_ID = each_data["id"]
-    return HIGHEST_ID + 1
-
 # ENDPOINT FOR ADDING A STUDENT'S INFORMATION
-@app.post("/student")
+@app.post("/student", status_code = status.HTTP_201_CREATED)
 def create_student(student: Student, db: Session = Depends(get_db)):
     # unpacking the student response body as keyword attributes
     new_student = StudentModel(**student.model_dump())
@@ -124,7 +116,7 @@ def create_student(student: Student, db: Session = Depends(get_db)):
     return new_student
 
 # ENDPOINT FOR COMPLETELY REPLACING THE PARTICULAR STUDENT'S INFORMATION
-@app.put("/student/{student_id}")
+@app.put("/student/{student_id}", status_code = status.HTTP_205_RESET_CONTENT)
 def update_student(student_id: int, student: Student, db: Session = Depends(get_db)):
     # database query
     statement = select(StudentModel).where(StudentModel.id == student_id)
@@ -148,7 +140,7 @@ def update_student(student_id: int, student: Student, db: Session = Depends(get_
     return result
 
 # ENDPOINT FOR PARTIAL UPDATE OF STUDENT'S INFORMATION
-@app.patch("/student/{student_id}")
+@app.patch("/student/{student_id}", status_code = status.HTTP_202_ACCEPTED)
 def partial_update_student(student_id: int, student: StudentPartialUpdate, db: Session = Depends(get_db)):
     # database query
     statement = select(StudentModel).where(StudentModel.id == student_id)
@@ -168,4 +160,24 @@ def partial_update_student(student_id: int, student: StudentPartialUpdate, db: S
     db.refresh(updated_student)
 
     return updated_student
+
+# ENDPOINT FOR DELETING A STUDENT'S INFORMATION
+@app.delete("/student/{student_id}", status_code = status.HTTP_204_NO_CONTENT)
+def delete_student(student_id: int, db: Session = Depends(get_db)):
+    # database query
+    statement = select(StudentModel).where(StudentModel.id == student_id)
+    # executing the query and storing it
+    result = db.execute(statement).scalars().first()
+
+    # if the requested student is not found, raise HTTP exception
+    if result is None:
+        raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = f"Student with ID {student_id} not found!")
+    
+    # deleting the student
+    db.delete(result)
+    db.commit()
+
+    return {
+        "message": "Student deleted successfully!"
+    }
 
