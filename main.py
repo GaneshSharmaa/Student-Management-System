@@ -84,7 +84,7 @@ def get_students(
     students = result.scalars().all()   # storing the response from the database
 
     # if no response found from the database then raise HTTP exception
-    if students is None:
+    if not students:
         raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = "Student not found!")
 
     return students
@@ -93,12 +93,12 @@ def get_students(
 @app.get("/student/{student_id}/semester/{semester}")
 def student_semester_detail(student_id: int, semester: int, db: Session = Depends(get_db)):
     # database query
-    statement = select(SemesterModel).where(SemesterModel.semester == semester and SemesterModel.student_id == student_id)
+    statement = select(SemesterModel).where(SemesterModel.semester == semester, SemesterModel.student_id == student_id)
     # executing the database query and then storing them in a list
     result = db.execute(statement).scalars().all()
 
     # if nothing is found, raise HTTP exception
-    if result is None:
+    if not result:
         raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = f"Student with ID {student_id} in semester {semester} not found!")
 
     return result
@@ -162,7 +162,7 @@ def partial_update_student(student_id: int, student: StudentPartialUpdate, db: S
     return updated_student
 
 # ENDPOINT FOR DELETING A STUDENT'S INFORMATION
-@app.delete("/student/{student_id}", status_code = status.HTTP_204_NO_CONTENT)
+@app.delete("/student/{student_id}")
 def delete_student(student_id: int, db: Session = Depends(get_db)):
     # database query
     statement = select(StudentModel).where(StudentModel.id == student_id)
