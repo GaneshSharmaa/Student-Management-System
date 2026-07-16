@@ -2,7 +2,7 @@
 from database.database import Base
 
 # importing necessary modules
-from sqlalchemy import Integer, String
+from sqlalchemy import Integer, String, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 
 # `mapped_column` represents database column
@@ -23,7 +23,7 @@ class Semester(Base):
     __tablename__ = "semester"
 
     semester_id: Mapped[int] = mapped_column(primary_key = True)
-    student_id: Mapped[int] = mapped_column(nullable = False)
+    student_id: Mapped[int] = mapped_column(ForeignKey("students.id"), nullable = False)
     subject: Mapped[str] = mapped_column(String(25), nullable = False)
     marks: Mapped[int] = mapped_column(Integer, nullable = False)
     semester: Mapped[int] = mapped_column(Integer, nullable = False)
