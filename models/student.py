@@ -20,7 +20,7 @@ class Student(Base):
     sex: Mapped[str] = mapped_column(String(8), nullable = False)
     latest_qualification: Mapped[str] = mapped_column(String(20), nullable = False)
 
-    # relationship
+    # relationship — this lets us navigate between objects
     semester_marks = relationship("SemesterMarks")
 
 # database model for semester data
@@ -35,6 +35,6 @@ class SemesterMarks(Base):
     marks: Mapped[int] = mapped_column(Integer, nullable = False)
     semester: Mapped[int] = mapped_column(Integer, nullable = False)
 
-    # relationship
+    # relationship — this lets us navigate between objects
     student = relationship("Student")
 
