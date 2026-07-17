@@ -21,7 +21,8 @@ class Student(Base):
     latest_qualification: Mapped[str] = mapped_column(String(20), nullable = False)
 
     # relationship — this lets us navigate between objects
-    semester_marks = relationship("SemesterMarks")
+    semester_marks = relationship("SemesterMarks", back_populates = "student")  # back_populates tell that they represent same relationship
+
 
 # database model for semester data
 class SemesterMarks(Base):
@@ -36,5 +37,5 @@ class SemesterMarks(Base):
     semester: Mapped[int] = mapped_column(Integer, nullable = False)
 
     # relationship — this lets us navigate between objects
-    student = relationship("Student")
+    student = relationship("Student", back_populates = "semester_marks")  # back_populates tell that they represent same relationship
 
