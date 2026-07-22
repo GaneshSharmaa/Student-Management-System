@@ -181,3 +181,16 @@ def delete_student(student_id: int, db: Session = Depends(get_db)):
         "message": "Student deleted successfully!"
     }
 
+@app.get("/students/{student_id}/marks")
+def get_students_marks(student_id: int, db: Session = Depends(get_db)):
+    statement = select(StudentModel).options(selectinload(StudentModel.semester_marks)).where(StudentModel.id == student_id)
+    result = db.scalar(statement)
+
+    if result is None:
+        raise HTTPException(
+            status_code = status.HTTP_404_NOT_FOUND,
+            detail = f"Student with ID {student_id} does not exists!"
+        )
+    
+    return result.semester_marks
+
