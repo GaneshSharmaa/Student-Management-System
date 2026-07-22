@@ -21,7 +21,7 @@ class Student(Base):
     latest_qualification: Mapped[str] = mapped_column(String(20), nullable = False)
 
     # relationship — this lets us navigate between objects
-    semester_marks = relationship("SemesterMarks", back_populates = "student")  # back_populates links relationship with corresponding relationship
+    semester_marks = relationship("SemesterMarks", back_populates = "student", cascade = "all, delete-orphan")  # back_populates links relationship with corresponding relationship
 
 
 # database model for semester data
