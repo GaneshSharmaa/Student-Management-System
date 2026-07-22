@@ -2,7 +2,7 @@
 from fastapi import FastAPI, HTTPException, status, Depends
 from pydantic import BaseModel
 from typing import Annotated
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 from sqlalchemy import select
 
 # # importing the data from the file
