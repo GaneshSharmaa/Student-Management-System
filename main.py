@@ -16,6 +16,7 @@ from schemas.student import Student, StudentPartialUpdate, StudentResponse
 from database.database import Base, engine
 from models.student import Student as StudentModel
 from models.student import SemesterMarks as SemesterMarksModel
+from models.user import User
 from database.dependencies import get_db
 
 # creating the database
