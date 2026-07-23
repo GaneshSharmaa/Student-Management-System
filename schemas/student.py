@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import List, Dict, Optional
 
 class Student(BaseModel):
@@ -12,4 +12,16 @@ class StudentPartialUpdate(BaseModel):
     age: int | None = None
     sex: str | None = None
     latest_qualification: str | None = None
+
+class SemesterMarkResponse(BaseModel):
+    subject: str
+    marks: int
+
+    model_config = ConfigDict(from_attributes = True)
+
+class StudentResponse(Student):
+    id: int
+    semester_marks: List[SemesterMarkResponse]
+
+    model_config = ConfigDict(from_attributes = True)
 
