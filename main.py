@@ -11,6 +11,7 @@ from sqlalchemy import select
 
 # importing the schemas
 from schemas.student import Student, StudentPartialUpdate, StudentResponse
+from schemas.user import UserRegister, UserResponse
 
 # importing the models
 from database.database import Base, engine
@@ -18,6 +19,9 @@ from models.student import Student as StudentModel
 from models.student import SemesterMarks as SemesterMarksModel
 from models.user import User
 from database.dependencies import get_db
+
+# importing the modules from auth
+from auth.hashing import hash_password, verify_password
 
 # creating the database
 Base.metadata.create_all(bind = engine)
@@ -194,4 +198,50 @@ def get_students_marks(student_id: int, db: Session = Depends(get_db)):
         )
     
     return result
+
+@app.post("/register", response_model = UserResponse)
+def user_register(user: UserRegister, db: Session = Depends(get_db)):
+    # fetching if user with this username exists
+    username_check = db.scalar(select(User).where(User.username == user.username))
+
+    # fetching if user with this email exists
+    email_check = db.scalar(select(User).where(User.email == user.email))
+
+    # raising HTTP exception if both username and email exists
+    if username_check is not None and email_check is not None:
+        raise HTTPException(
+            status_code = status.HTTP_409_CONFLICT,
+            detail = "Username and email already exists!"
+        )
+
+    # raising HTTP exception if user exists
+    if username_check is not None:
+        raise HTTPException(
+            status_code = status.HTTP_409_CONFLICT,
+            detail = "Username already exists!"
+        )
+
+    # raising HTTP exception if email exists
+    if email_check is not None:
+        raise HTTPException(
+            status_code = status.HTTP_409_CONFLICT,
+            detail = "Email already exists!"
+        )
+
+    # hashing the password
+    hashed_password = hash_password(user.password)
+
+    # ORM object creation
+    new_user = User(
+        username = user.username,
+        email = user.email,
+        hashed_password = hashed_password
+    )
+
+    # database operation
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+
+    return new_user
 
