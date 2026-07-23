@@ -10,7 +10,7 @@ from sqlalchemy import select
 # from student_information.semester_data import SEMESTER_1    # moved to data persistence using PostgreSQL
 
 # importing the schemas
-from schemas.student import Student, StudentPartialUpdate
+from schemas.student import Student, StudentPartialUpdate, StudentResponse
 
 # importing the models
 from database.database import Base, engine
@@ -181,7 +181,7 @@ def delete_student(student_id: int, db: Session = Depends(get_db)):
         "message": "Student deleted successfully!"
     }
 
-@app.get("/students/{student_id}/marks")
+@app.get("/students/{student_id}/marks", response_model = StudentResponse)
 def get_students_marks(student_id: int, db: Session = Depends(get_db)):
     statement = select(StudentModel).options(selectinload(StudentModel.semester_marks)).where(StudentModel.id == student_id)
     result = db.scalar(statement)
@@ -192,5 +192,5 @@ def get_students_marks(student_id: int, db: Session = Depends(get_db)):
             detail = f"Student with ID {student_id} does not exists!"
         )
     
-    return result.semester_marks
+    return result
 
