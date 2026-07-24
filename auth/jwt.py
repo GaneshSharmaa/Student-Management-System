@@ -16,7 +16,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 if SECRET_KEY is None:
     raise ValueError("SECRET_KEY environment variable not set.")
 
-def create_access_token(data: dict):
+def create_access_token(data: dict) -> str:
     # making a copy of the data dictionary
     to_encode = data.copy()
 
