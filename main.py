@@ -11,7 +11,7 @@ from sqlalchemy import select
 
 # importing the schemas
 from schemas.student import Student, StudentPartialUpdate, StudentResponse
-from schemas.user import UserRegister, UserResponse
+from schemas.user import UserRegister, UserResponse, UserLogin
 
 # importing the models
 from database.database import Base, engine
@@ -244,4 +244,22 @@ def user_register(user: UserRegister, db: Session = Depends(get_db)):
     db.refresh(new_user)
 
     return new_user
+
+@app.post("/login")
+def user_login(login: UserLogin, db: Session = Depends(get_db)):
+    user = db.scalar(select(User).where(User.email == login.email))
+
+    if user is None:
+        raise HTTPException(
+            status_code = status.HTTP_401_UNAUTHORIZED,
+            detail = "Invalid email or password."
+        )
+
+    if not verify_password(login.password, user.hashed_password):
+        raise HTTPException(
+            status_code = status.HTTP_401_UNAUTHORIZED,
+            detail = "Invalid email or password."
+        )
+
+    return {"message": "Login successful!"}
 
